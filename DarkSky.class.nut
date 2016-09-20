@@ -14,7 +14,7 @@ class DarkSky {
     // License: MIT
 
     static FORECAST_URL = "https://api.darksky.net/forecast/";
-    static VERSION = [1,0,0];
+    static VERSION = [1,0,1];
 
     _apikey = null;
     _units = null;

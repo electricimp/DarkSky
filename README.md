@@ -1,6 +1,6 @@
-# DarkSky 1.0.0
+# DarkSky 1.0.1
 
-This class provides access to the Dark Sky API provided by [Dark Sky](https://darksky.net/). This API supersedes the Forecast API previously provided by Dark Sky and supported by Electric Imp’s Forecastio library. Version 1.0.0 of the DarkSky library is equivalent to version 1.1.2 of the Forecastio library.
+This class provides access to the Dark Sky API provided by [Dark Sky](https://darksky.net/). This API supersedes the Forecast API previously provided by Dark Sky and supported by Electric Imp’s Forecastio library. Version 1.0.1 of the DarkSky library is equivalent to version 1.1.2 of the Forecastio library.
 
 Access to the Dark Sky API is controlled by key. To obtain a key, please register for developer access [here](https://darksky.net/dev/register).
 
@@ -8,7 +8,7 @@ The Dark Sky API returns a wealth of data (in JSON format). As such, it is left 
 
 Please note that the Dark Sky API is a commercial service. Though the first 1000 API calls made under your API key are free of charge, subsequent calls are billed at a rate of $0.0001 per call. You and your application will not be notified by the library if this occurs, so you may wish to add suitable call-counting code to your application. The usage terms also require the addition of a “Powered by Dark Sky” badge that links to `https://darksky.net/poweredby/` wherever data from the API is displayed.
 
-**To add this library to your project, add** `#require "DarkSky.class.nut:1.0.0"` **to the top of your agent code**
+**To add this library to your project, add** `#require "DarkSky.class.nut:1.0.1"` **to the top of your agent code**
 
 ## Class Usage
 
@@ -19,7 +19,7 @@ The constructor requires your Dark Sky API key as a string.
 You may also pass a boolean value into the *debug* parameter: if you pass `true`, extra debugging information will be posted to the device log. This is disabled by default.
 
 ```squirrel
-#require "DarkSky.class.nut:1.0.0"
+#require "DarkSky.class.nut:1.0.1"
 
 const API_KEY = "<YOUR_DARK_SKY_API_KEY>";
 
@@ -132,6 +132,7 @@ See *setUnits()*, above, for an example of *setLanguage()*’s use.
 ## Release Notes
 
 - 1.0.0 - Convert Forecastio 1.1.2 to DarkSky 1.0.0 following Dark Sky rebranding.
+- 1.0.1 - Fix uninitialized member property.
 
 ## License
 
