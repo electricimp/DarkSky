@@ -155,7 +155,7 @@ class DarkSky {
                     try {
                         data = http.jsondecode(resp.body);
                     } catch(exp) {
-                        err = "Unable to decode data received from Forecast.io: " + exp;
+                        err = "Unable to decode data received from Dark Sky: " + exp;
                     }
                 }
 
@@ -192,7 +192,7 @@ class DarkSky {
     }
 
     function _getCallCount(resp) {
-        // Extract daily API request count from Forecast.io response header
+        // Extract daily API request count from Dark Sky response header
         if ("headers" in resp) {
             if ("x-forecast-api-calls" in resp.headers) {
                 local a = resp.headers["x-forecast-api-calls"];
