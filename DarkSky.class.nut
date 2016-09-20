@@ -34,6 +34,7 @@ class DarkSky {
 
         _debug = debug;
         _apikey = key;
+        _units = "auto";
     }
 
     function forecastRequest(longitude = 999, latitude = 999, callback = null) {
