@@ -10,11 +10,11 @@ class DarkSky {
     // It is up to your application to extract the data you require
 
     // Written by Tony Smith (@smittytone)
-    // Copyright Electric Imp, Inc. 2016
+    // Copyright Electric Imp, Inc. 2016-18
     // License: MIT
 
     static FORECAST_URL = "https://api.darksky.net/forecast/";
-    static VERSION = [1,0,1];
+    static VERSION = "2.0.0";
 
     _apikey = null;
     _units = null;
@@ -22,31 +22,30 @@ class DarkSky {
     _debug = false;
 
     constructor (key = null, debug = false) {
-        if (imp.environment() != ENVIRONMENT_AGENT) {
-            server.error("DarkSky class must be instantiated by the agent");
-            return null;
-        }
+        // Check for instantiation parameter errors
+        if (imp.environment() != ENVIRONMENT_AGENT) throw "DarkSky class must be instantiated by the agent";
+        if (key == "" || key = null) throw "DarkSky class requires an API key";
+        if (typeof key != "string") throw "DarkSky class requires an API key supplied as a string";
 
-        if (key == "" || key = null) {
-            server.error("DarkSky class requires an API key");
-            return null;
-        }
-
+        // Set instance properties
+        if (typeof debug != "boolean") debug = false;
         _debug = debug;
-        _apikey = key;
         _units = "auto";
+        _apikey = key;
     }
 
     function forecastRequest(longitude = 999, latitude = 999, callback = null) {
+        // Make a request for future weather data
         // Parameters:
-        //  1. Longitude of location for which a forecast is required
-        //  2. Latitude of location for which a forecast is required
-        //  3. Optional synchronous operation callback
+        //   1. Longitude of location for which a forecast is required
+        //   2. Latitude of location for which a forecast is required
+        //   3. Optional synchronous operation callback
         // Returns:
-        //  If callback is null, the function returns a table with key 'response'
-        //  If callback is not null, the function returns nothing
-        //  If there is an error, the function returns a table with key 'err'
+        //   If callback is null, the function returns a table with key 'response'
+        //   If callback is not null, the function returns nothing
+        //   If there is an error, the function returns a table with key 'err'
 
+        // Check the supplied co-ordinates
         if (!_checkCoords(longitude, latitude, "forecastRequest")) {
             if (callback) {
                 callback("Co-ordinate error", null);
@@ -56,22 +55,25 @@ class DarkSky {
             }
         }
 
+        // Co-ordinates good, so get a forecast
         local url = FORECAST_URL + _apikey + "/" + format("%.6f", latitude) + "," + format("%.6f", longitude);
         url = _addOptions(url);
         return _sendRequest(http.get(url), callback);
     }
 
     function timeMachineRequest(longitude = 999, latitude = 999, time = null, callback = null) {
+        // Make a request for historical weather data
         // Parameters:
-        //  1. Longitude of location for which a forecast is required
-        //  2. Latitude of location for which a forecast is required
-        //  3. A Unix time or ISO 1601-formatted string
-        //  4. Optional synchronous operation callback
+        //   1. Longitude of location for which a forecast is required
+        //   2. Latitude of location for which a forecast is required
+        //   3. A Unix time or ISO 1601-formatted string
+        //   4. Optional synchronous operation callback
         // Returns:
-        //  If callback is null, the function returns a table with key 'response'
-        //  If callback is not null, the function returns nothing
-        //  If there is an error, the function returns a table with key 'err'
+        //   If callback is null, the function returns a table with key 'response'
+        //   If callback is not null, the function returns nothing
+        //   If there is an error, the function returns a table with key 'err'
 
+        // Check the supplied co-ordinates
         if (!_checkCoords(longitude, latitude, "timeMachineRequest")) {
             if (callback) {
                 callback("Co-ordinate error", null);
@@ -81,13 +83,14 @@ class DarkSky {
             }
         }
 
+        // Check the supplied co-ordinates
         if (time == null || time.tostring().len() == 0) {
             if (_debug) server.error("DarkSky.timeMachineRequest() requires a valid time parameter");
             return {"err": "Timestamp error"};
         }
 
         local timeString;
-        if (typeof time == "integer") {
+        if (typeof time == "integer" || typeof time == "float") {
             timeString = time.tostring();
         } else if (typeof time == "string") {
             timeString = time;
@@ -96,12 +99,18 @@ class DarkSky {
             return {"err": "Timestamp error"};
         }
 
+        // Co-ordinates good, so get the historical data
         local url = FORECAST_URL + _apikey + "/" + format("%.6f", latitude) + "," + format("%.6f", longitude) + "," + timeString;
         url = _addOptions(url);
         return _sendRequest(http.get(url), callback);
     }
 
-    function setUnits(units = "us") {
+    function setUnits(units = "auto") {
+        // Specify the preferred weather report's units
+        // Parameters:
+        //   1. Country code indicating the type of units (default: auto)
+        // Returns:
+        //   The instance
         local types = ["us", "si", "ca", "uk", "uk2", "auto"];
         local match = false;
         units = units.tolower();
@@ -113,8 +122,8 @@ class DarkSky {
         }
 
         if (!match) {
-            if (_debug) server.error("Incorrect units option selected; using default value");
-            units = "us";
+            if (_debug) server.error("Incorrect units option selected (" + units + "); using default value (auto)");
+            units = "auto";
         }
 
         if (units == "uk") units = "uk2";
@@ -123,6 +132,11 @@ class DarkSky {
     }
 
     function setLanguage(language = "en") {
+        // Specify the preferred weather report's language
+        // Parameters:
+        //   1. Country code indicating the language (default: English)
+        // Returns:
+        //   The instance
         local types = ["ar", "az", "be", "bs", "cs", "de", "el", "en", "es", "fr", "hr",
                        "hu", "id", "it", "is", "kw", "nb", "nl", "pl", "pt", "ru", "sk",
                        "sr", "sv", "tet", "tr", "uk", "x-pig-latin", "zh", "zh-tw"];
@@ -136,7 +150,7 @@ class DarkSky {
         }
 
         if (!match) {
-            if (_debug) server.error("Incorrect language option selected; using default value");
+            if (_debug) server.error("Incorrect language option selected (" + language + "); using default value (en)");
             language = "en";
         }
 
@@ -187,7 +201,6 @@ class DarkSky {
             // Create table of returned data
             returnTable.err <- err;
             returnTable.data <- data;
-
             return returnTable;
         }
     }
@@ -200,17 +213,16 @@ class DarkSky {
                 return a.tointeger();
             }
         }
-
         return -1;
     }
 
-    function _checkCoords(longitude, latitude, caller) {
+    function _checkCoords(longitude = 999.0, latitude = 999.0, caller = "function") {
         // Check that valid co-ords have been supplied
         if (typeof longitude != "float") {
             try {
                 longitude = longitude.tofloat();
             } catch (err) {
-                if (_debug) server.error("DarkSky." + caller + "() can't convert supplied longitude value");
+                if (_debug) server.error("DarkSky." + caller + "() can't process supplied longitude value");
                 return false;
             }
         }
@@ -219,22 +231,22 @@ class DarkSky {
             try {
                 latitude = latitude.tofloat();
             } catch (err) {
-                if (_debug) server.error("DarkSky." + caller + "() can't convert supplied latitude value");
+                if (_debug) server.error("DarkSky." + caller + "() can't process supplied latitude value");
                 return false;
             }
         }
 
-        if (longitude == 999 || latitude == 999) {
+        if (longitude == 999.0 || latitude == 999.0) {
             if (_debug) server.error("DarkSky." + caller + "() requires valid latitude/longitude co-ordinates");
             return false;
         }
 
-        if (latitude > 90 || latitude < -90) {
+        if (latitude > 90.0 || latitude < -90.0) {
             if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate");
             return false;
         }
 
-        if (longitude > 180 || longitude < -180) {
+        if (longitude > 180.0 || longitude < -180.0) {
             if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate");
             return false;
         }
@@ -242,7 +254,8 @@ class DarkSky {
         return true;
     }
 
-    function _addOptions(baseurl) {
+    function _addOptions(baseurl = "") {
+        // Add URL-encoded options to the request URL
         local opts = "?units=" + _units;
         if (_lang) opts = opts + "&lang=" + _lang;
         return (baseurl + opts);
