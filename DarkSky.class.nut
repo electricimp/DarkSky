@@ -13,8 +13,8 @@ class DarkSky {
     // Copyright Electric Imp, Inc. 2016-18
     // License: MIT
 
-    static FORECAST_URL = "https://api.darksky.net/forecast/";
     static VERSION = "2.0.0";
+    static FORECAST_URL = "https://api.darksky.net/forecast/";
 
     _apikey = null;
     _units = null;
@@ -28,7 +28,7 @@ class DarkSky {
         if (typeof key != "string") throw "DarkSky class requires an API key supplied as a string";
 
         // Set instance properties
-        if (typeof debug != "boolean") debug = false;
+        if (typeof debug != "bool") debug = false;
         _debug = debug;
         _units = "auto";
         _apikey = key;
@@ -122,12 +122,13 @@ class DarkSky {
         }
 
         if (!match) {
-            if (_debug) server.error("Incorrect units option selected (" + units + "); using default value (auto)");
+            if (_debug) server.error("DarkSky.setUnits() incorrect units option selected (" + units + "); using default value (auto)");
             units = "auto";
         }
 
         if (units == "uk") units = "uk2";
         _units = units;
+        if (_debug) server.log("DarkSky units selected: " + _units);
         return this;
     }
 
@@ -150,11 +151,12 @@ class DarkSky {
         }
 
         if (!match) {
-            if (_debug) server.error("Incorrect language option selected (" + language + "); using default value (en)");
+            if (_debug) server.error("DarkSky.setLanguage() incorrect language option selected (" + language + "); using default value (en)");
             language = "en";
         }
 
         _lang = language;
+        if (_debug) server.log("DarkSky language selected: " + _lang);
         return this;
     }
 
