@@ -22,7 +22,14 @@ class DarkSky {
     _debug = false;
 
     constructor (key = null, debug = false) {
-        // Check for instantiation parameter errors
+        // Object constructor
+        // PARAMETERS
+        //   1. DarkSky API Key as a string (required)
+        //   2. Debugging flag (optional; default: false)
+        // RETURNS
+        //   DarkSky instance, or throws on error
+
+        /// Check for instantiation parameter errors
         if (imp.environment() != ENVIRONMENT_AGENT) throw "DarkSky class must be instantiated by the agent";
         if (key == "" || key = null) throw "DarkSky class requires an API key";
         if (typeof key != "string") throw "DarkSky class requires an API key supplied as a string";
@@ -36,11 +43,11 @@ class DarkSky {
 
     function forecastRequest(longitude = 999, latitude = 999, callback = null) {
         // Make a request for future weather data
-        // Parameters:
+        // PARAMETERS
         //   1. Longitude of location for which a forecast is required
         //   2. Latitude of location for which a forecast is required
         //   3. Optional synchronous operation callback
-        // Returns:
+        // RETURNS
         //   If callback is null, the function returns a table with key 'response'
         //   If callback is not null, the function returns nothing
         //   If there is an error, the function returns a table with key 'err'
@@ -63,12 +70,12 @@ class DarkSky {
 
     function timeMachineRequest(longitude = 999, latitude = 999, time = null, callback = null) {
         // Make a request for historical weather data
-        // Parameters:
+        // PARAMETERS
         //   1. Longitude of location for which a forecast is required
         //   2. Latitude of location for which a forecast is required
         //   3. A Unix time or ISO 1601-formatted string
         //   4. Optional synchronous operation callback
-        // Returns:
+        // RETURNS
         //   If callback is null, the function returns a table with key 'response'
         //   If callback is not null, the function returns nothing
         //   If there is an error, the function returns a table with key 'err'
@@ -107,9 +114,9 @@ class DarkSky {
 
     function setUnits(units = "auto") {
         // Specify the preferred weather report's units
-        // Parameters:
+        // PARAMETERS
         //   1. Country code indicating the type of units (default: auto)
-        // Returns:
+        // RETURNS
         //   The instance
         local types = ["us", "si", "ca", "uk", "uk2", "auto"];
         local match = false;
@@ -134,9 +141,9 @@ class DarkSky {
 
     function setLanguage(language = "en") {
         // Specify the preferred weather report's language
-        // Parameters:
+        // PARAMETERS
         //   1. Country code indicating the language (default: English)
-        // Returns:
+        // RETURNS
         //   The instance
         local types = ["ar", "az", "be", "bs", "cs", "de", "el", "en", "es", "fr", "hr",
                        "hu", "id", "it", "is", "kw", "nb", "nl", "pl", "pt", "ru", "sk",
