@@ -41,7 +41,7 @@ class DarkSky {
         _apikey = key;
     }
 
-    function forecastRequest(longitude = 999, latitude = 999, callback = null) {
+    function forecastRequest(longitude = 999.0, latitude = 999.0, callback = null) {
         // Make a request for future weather data
         // PARAMETERS
         //   1. Longitude of location for which a forecast is required
@@ -68,7 +68,7 @@ class DarkSky {
         return _sendRequest(http.get(url), callback);
     }
 
-    function timeMachineRequest(longitude = 999, latitude = 999, time = null, callback = null) {
+    function timeMachineRequest(longitude = 999.0, latitude = 999.0, time = null, callback = null) {
         // Make a request for historical weather data
         // PARAMETERS
         //   1. Longitude of location for which a forecast is required
