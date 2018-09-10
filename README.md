@@ -57,28 +57,28 @@ Table (the decoded response from Dark Sky) or nothing (if *forecastRequest()* is
 
 ```squirrel
 fc.forecastRequest(myLongitude, myLatitude, function(err, data) {
-  if (err) server.error(err);
+    if (err) server.error(err);
 
-  if (data) {
-    server.log("Weather forecast data received from Dark Sky");
-    if ("hourly" in data) {
-      if ("data" in data.hourly) {
-        // Get second item in array: this is the weather one hour from now
-        local item = data.hourly.data[1];
-        local sendData = {};
-        sendData.cast <- item.icon;
-        sendData.temp <- item.apparentTemperature;
-        device.send("weather.show.forecast", sendData);
+    if (data) {
+        server.log("Weather forecast data received from Dark Sky");
+        if ("hourly" in data) {
+            if ("data" in data.hourly) {
+                // Get second item in array: this is the weather one hour from now
+                local item = data.hourly.data[1];
+                local sendData = {};
+                sendData.cast <- item.icon;
+                sendData.temp <- item.apparentTemperature;
+                device.send("weather.show.forecast", sendData);
 
-        // Log the output
-        local celsius = ((sendData.temp.tofloat() - 32.0) * 5.0) / 9.0;
-        local message = "Outlook: " + sendData.cast + ". Temperature: " + format("%.1f", celsius) + "ºC";
-        server.log(message);
-      }
+                // Log the output
+                local celsius = ((sendData.temp.tofloat() - 32.0) * 5.0) / 9.0;
+                local message = "Outlook: " + sendData.cast + ". Temperature: " + format("%.1f", celsius) + "ºC";
+                server.log(message);
+            }
+        }
+
+        if ("callCount" in data) server.log("Current Dark Sky API call tally: " + data.callCount + "/1000");
     }
-
-    if ("callCount" in data) server.log("Current Dark Sky API call tally: " + data.callCount + "/1000");
-  }
 });
 ```
 
@@ -113,27 +113,27 @@ Table (the decoded response from Dark Sky) or nothing (if *timeMachineRequest()*
 ```squirrel
 local monthAgo = time() - 2592000;
 fc.timeMachineRequest(myLongitude, myLatitude, monthAgo, function(err, data) {
-  if (err) server.error(err);
+    if (err) server.error(err);
 
-  if (data) {
-    server.log("Weather forecast data received from Dark Sky");
-    if ("hourly" in data) {
-      if ("data" in data.hourly) {
-        local item = data.hourly.data[0];
-        local sendData = {};
-        sendData.cast <- item.icon;
-        sendData.temp <- item.apparentTemperature;
-        device.send("weather.show.forecast", sendData);
+    if (data) {
+        server.log("Weather forecast data received from Dark Sky");
+        if ("hourly" in data) {
+            if ("data" in data.hourly) {
+                local item = data.hourly.data[0];
+                local sendData = {};
+                sendData.cast <- item.icon;
+                sendData.temp <- item.apparentTemperature;
+                device.send("weather.show.forecast", sendData);
 
-        // Log the output
-        local celsius = ((sendData.temp.tofloat() - 32.0) * 5.0) / 9.0;
-        local message = "Outlook: " + sendData.cast + ". Temperature: " + format("%.1f", celsius) + "ºC";
-        server.log(message);
-      }
+                // Log the output
+                local celsius = ((sendData.temp.tofloat() - 32.0) * 5.0) / 9.0;
+                local message = "Outlook: " + sendData.cast + ". Temperature: " + format("%.1f", celsius) + "ºC";
+                server.log(message);
+            }
+        }
+
+        if ("callCount" in data) server.log("Current Dark Sky API call tally: " + data.callCount + "/1000");
     }
-
-    if ("callCount" in data) server.log("Current Dark Sky API call tally: " + data.callCount + "/1000");
-  }
 });
 ```
 
