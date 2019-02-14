@@ -1,64 +1,84 @@
+/**
+ * This class allows you to make one of two possible calls to DarkSky’s
+ * Dark Sky API, ie. forecast requests and time-machine requests. For
+ * more information, see https://darksky.net/dev/docs
+ * Access to the API is controlled by key. Register for developer access
+ * here: https://darksky.net/dev/register
+ *
+ * NOTE this class does not parse the incoming data, which is highly complex.
+ *      It is up to your application to extract the data you require
+ *
+ * @author    Tony Smith (@smittytone)
+ * @copyright Electric Imp, Inc. 2016-18
+ * @license   MIT
+ *
+ * @class
+ *
+*/
+
 class DarkSky {
-
-    // This class allows you to make one of two possible calls to DarkSky’s
-    // Dark Sky API, ie. forecast requests and time-machine requests. For
-    // more information, see https://darksky.net/dev/docs
-    // Access to the API is controlled by key. Register for developer access
-    // here: https://darksky.net/dev/register
-
-    // Note: this class does not parse the incoming data, which is highly complex.
-    // It is up to your application to extract the data you require
-
-    // Written by Tony Smith (@smittytone)
-    // Copyright Electric Imp, Inc. 2016-18
-    // License: MIT
 
     static VERSION = "2.0.0";
     static FORECAST_URL = "https://api.darksky.net/forecast/";
+
+    /**
+     *
+     * A running count API accesses as returned by Dark Sky
+     *
+     * @property
+     *
+     */
+    callCount = 0;
+    
+    // ********** Private Properties **********
 
     _apikey = null;
     _units = null;
     _lang = null;
     _debug = false;
 
+    /**
+     * The Dark Sky construtor
+     *
+     * @constructor
+     *
+     * @param {string} apiKey  - Your Dark Sky service API key.
+     * @param {bool}   [debug] - Whether to log extra debugging info (true) or not (false). Default: false.
+     *
+    */
     constructor (key = null, debug = false) {
-        // Object constructor
-        // PARAMETERS
-        //   1. DarkSky API Key as a string (required)
-        //   2. Debugging flag (optional; default: false)
-        // RETURNS
-        //   DarkSky instance, or throws on error
+        // Check for instantiation parameter errors
+        if (imp.environment() != ENVIRONMENT_AGENT) throw "DarkSky() must be instantiated by the agent";
+        if (key == "" || key = null) throw "DarkSky() requires an API key";
+        if (typeof key != "string") throw "DarkSky() requires an API key supplied as a string";
 
-        /// Check for instantiation parameter errors
-        if (imp.environment() != ENVIRONMENT_AGENT) throw "DarkSky class must be instantiated by the agent";
-        if (key == "" || key = null) throw "DarkSky class requires an API key";
-        if (typeof key != "string") throw "DarkSky class requires an API key supplied as a string";
-
-        // Set instance properties
+        // Set private properties
         if (typeof debug != "bool") debug = false;
         _debug = debug;
         _units = "auto";
         _apikey = key;
     }
 
+    /**
+     * Make a request for future weather data
+     *
+     * @param {float}    longitude  - Longitude of location for which a forecast is required.
+     * @param {float}    latitude   - Latitude of location for which a forecast is required. 
+     * @param {function} [callback] - Optional asynchronous operation callback.
+     *
+     * @returns {table|string|null} If 'callback' is null, the function returns a table with key 'response';
+     *                              if there was an error, the function returns a table with key 'error'.
+     *                              If 'callback' is not null, the function returns nothing;
+     *                              
+    */
     function forecastRequest(longitude = 999.0, latitude = 999.0, callback = null) {
-        // Make a request for future weather data
-        // PARAMETERS
-        //   1. Longitude of location for which a forecast is required
-        //   2. Latitude of location for which a forecast is required
-        //   3. Optional synchronous operation callback
-        // RETURNS
-        //   If callback is null, the function returns a table with key 'response'
-        //   If callback is not null, the function returns nothing
-        //   If there is an error, the function returns a table with key 'err'
-
         // Check the supplied co-ordinates
         if (!_checkCoords(longitude, latitude, "forecastRequest")) {
             if (callback) {
                 callback("Co-ordinate error", null);
-                return null;
+                return;
             } else {
-                return {"err": "Co-ordinate error"};
+                return {"error": "Co-ordinate error"};
             }
         }
 
@@ -68,32 +88,34 @@ class DarkSky {
         return _sendRequest(http.get(url), callback);
     }
 
+    /**
+     * Make a request for historical weather data
+     *
+     * @param {float}    longitude  - Longitude of location for which a forecast is required.
+     * @param {float}    latitude   - Latitude of location for which a forecast is required. 
+     * @param {string}   time       - A Unix time or ISO 1601-formatted string.
+     * @param {function} [callback] - Optional asynchronous operation callback.
+     *
+     * @returns {table|string|null} If 'callback' is null, the function returns a table with key 'response';
+     *                              if there was an error, the function returns a table with key 'error'.
+     *                              If 'callback' is not null, the function returns nothing;
+     *                              
+    */
     function timeMachineRequest(longitude = 999.0, latitude = 999.0, time = null, callback = null) {
-        // Make a request for historical weather data
-        // PARAMETERS
-        //   1. Longitude of location for which a forecast is required
-        //   2. Latitude of location for which a forecast is required
-        //   3. A Unix time or ISO 1601-formatted string
-        //   4. Optional synchronous operation callback
-        // RETURNS
-        //   If callback is null, the function returns a table with key 'response'
-        //   If callback is not null, the function returns nothing
-        //   If there is an error, the function returns a table with key 'err'
-
         // Check the supplied co-ordinates
         if (!_checkCoords(longitude, latitude, "timeMachineRequest")) {
             if (callback) {
                 callback("Co-ordinate error", null);
                 return null;
             } else {
-                return {"err": "Co-ordinate error"};
+                return {"error": "Co-ordinate error"};
             }
         }
 
         // Check the supplied co-ordinates
         if (time == null || time.tostring().len() == 0) {
             if (_debug) server.error("DarkSky.timeMachineRequest() requires a valid time parameter");
-            return {"err": "Timestamp error"};
+            return {"error": "Timestamp error"};
         }
 
         local timeString;
@@ -103,7 +125,7 @@ class DarkSky {
             timeString = time;
         } else {
             if (_debug) server.error("DarkSky.timeMachineRequest() requires a valid time parameter");
-            return {"err": "Timestamp error"};
+            return {"error": "Timestamp error"};
         }
 
         // Co-ordinates good, so get the historical data
@@ -112,12 +134,25 @@ class DarkSky {
         return _sendRequest(http.get(url), callback);
     }
 
+    /**
+     * Get the current Dakr Sky API call count
+     *
+     * @returns {integer} The most recent call count.
+     *                              
+    */
+    function getCallCount() {
+        return callCount;
+    }
+
+    /**
+     * Specify the preferred weather report's units
+     *
+     * @param {string} [units] - Country code indicating the type of units. Default: automatic, based on location.
+     *
+     * @returns {instance} The Dark Sky instance (this).
+     *                              
+    */
     function setUnits(units = "auto") {
-        // Specify the preferred weather report's units
-        // PARAMETERS
-        //   1. Country code indicating the type of units (default: auto)
-        // RETURNS
-        //   The instance
         local types = ["us", "si", "ca", "uk", "uk2", "auto"];
         local match = false;
         units = units.tolower();
@@ -139,12 +174,15 @@ class DarkSky {
         return this;
     }
 
+    /**
+     * Specify the preferred weather report's language
+     *
+     * @param {string} [language] - Country code indicating the language. Default: English.
+     *
+     * @returns {instance} The Dark Sky instance (this).
+     *                              
+    */
     function setLanguage(language = "en") {
-        // Specify the preferred weather report's language
-        // PARAMETERS
-        //   1. Country code indicating the language (default: English)
-        // RETURNS
-        //   The instance
         local types = ["ar", "az", "be", "bs", "cs", "de", "el", "en", "es", "fr", "hr",
                        "hu", "id", "it", "is", "kw", "nb", "nl", "pl", "pt", "ru", "sk",
                        "sr", "sv", "tet", "tr", "uk", "x-pig-latin", "zh", "zh-tw"];
@@ -169,10 +207,21 @@ class DarkSky {
 
     // ********** PRIVATE FUNCTIONS - DO NOT CALL **********
 
-    function _sendRequest(req, cb) {
-        if (cb) {
+    /**
+     * Specify the preferred weather report's language
+     *
+     * @private
+     *
+     * @param {imp::httprequest} req  - The HTTPS request to send.
+     * @param {function}         [cb] - Optional callback function.
+     *
+     * @returns {imp::httpresponse|null} The HTTPS response, or nothing if 'cb' is not null.
+     *                              
+    */
+    function _sendRequest(req, cb = null) {
+        local err, data, count;
+        if (cb != null) {
             req.sendasync(function(resp) {
-                local err, data, count;
                 if (resp.statuscode != 200) {
                     err = format("Unable to retrieve forecast data (code: %i)", resp.statuscode);
                 } else {
@@ -185,14 +234,17 @@ class DarkSky {
 
                 // Add daily API request count to 'data'
                 count = _getCallCount(resp);
-                if (count != -1) data.callCount <- count;
+                if (count != -1) {
+                    data.callCount <- count;
+                    callCount = count;
+                }
 
                 cb(err, data);
             }.bindenv(this));
             return null;
         } else {
             local resp = req.sendsync();
-            local err, data, count, returnTable;
+            local returnTable;
             if (resp.statuscode != 200) {
                 err = format("Unable to retrieve forecast data (code: %i)", response.statuscode);
             } else {
@@ -205,28 +257,56 @@ class DarkSky {
 
             // Add daily API request count to 'data'
             count = _getCallCount(resp);
-            if (count != -1) data.callCount <- count;
+            if (count != -1) {
+                data.callCount <- count;
+                callCount = count;
+            }
 
             // Create table of returned data
-            returnTable.err <- err;
+            returnTable.error <- err;
             returnTable.data <- data;
             return returnTable;
         }
     }
 
+    /**
+     * Extract daily API request count from Dark Sky response header
+     *
+     * @private
+     *
+     * @param {imp::httpresponse} resp - The HTTPS response.
+     *
+     * @returns {integer} The latest request count, or -1 on error.
+     *                              
+    */
     function _getCallCount(resp) {
-        // Extract daily API request count from Dark Sky response header
+        // 
         if ("headers" in resp) {
             if ("x-forecast-api-calls" in resp.headers) {
                 local a = resp.headers["x-forecast-api-calls"];
-                return a.tointeger();
+                try {
+                    return a.tointeger();
+                } catch(e) {
+                    // NOP
+                }
             }
         }
         return -1;
     }
 
+    /**
+     * Check that valid co-ords have been supplied
+     *
+     * @private
+     *
+     * @param {float}  longitude - Longitude of location for which a forecast is required.
+     * @param {float}  latitude  - Latitude of location for which a forecast is required.
+     * @param {string} caller    - The name of the calling function, for error reporting.
+     *
+     * @returns {Boolean} Whether the supplied co-ordinates are valid (true) or not (false).
+     *                              
+    */
     function _checkCoords(longitude = 999.0, latitude = 999.0, caller = "function") {
-        // Check that valid co-ords have been supplied
         if (typeof longitude != "float") {
             try {
                 longitude = longitude.tofloat();
@@ -251,20 +331,31 @@ class DarkSky {
         }
 
         if (latitude > 90.0 || latitude < -90.0) {
-            if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate");
+            if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate (value out of range)");
             return false;
         }
 
         if (longitude > 180.0 || longitude < -180.0) {
-            if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate");
+            if (_debug) server.error("DarkSky." + caller + "() requires valid a latitude co-ordinate (value out of range)");
             return false;
         }
 
         return true;
     }
 
+    /**
+     * Add URL-encoded options to the request URL
+     *
+     * Used when assembling HTTPS requests
+     *
+     * @private
+     *
+     * @param {string} [baseurl] - Optional base URL.
+     *
+     * @returns {string} The full URL will added options
+     *                              
+    */
     function _addOptions(baseurl = "") {
-        // Add URL-encoded options to the request URL
         local opts = "?units=" + _units;
         if (_lang) opts = opts + "&lang=" + _lang;
         return (baseurl + opts);
