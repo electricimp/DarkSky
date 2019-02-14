@@ -28,7 +28,7 @@ class DarkSky {
      * @property
      *
      */
-    callCount = 0;
+    callCount = -1;
     
     // ********** Private Properties **********
 
