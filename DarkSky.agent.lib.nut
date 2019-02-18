@@ -227,16 +227,17 @@ class DarkSky {
                 } else {
                     try {
                         data = http.jsondecode(resp.body);
+
+                        // Add daily API request count to 'data'
+                        count = _getCallCount(resp);
+                        if (count != -1) {
+                            data.callCount <- count;
+                            callCount = count;
+                        }
                     } catch(exp) {
                         err = "Unable to decode data received from Dark Sky: " + exp;
+                        data = null;
                     }
-                }
-
-                // Add daily API request count to 'data'
-                count = _getCallCount(resp);
-                if (count != -1) {
-                    data.callCount <- count;
-                    callCount = count;
                 }
 
                 cb(err, data);
