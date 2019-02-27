@@ -222,52 +222,55 @@ class DarkSky {
         local err, data, count;
         if (cb != null) {
             req.sendasync(function(resp) {
-                if (resp.statuscode != 200) {
-                    err = format("Unable to retrieve forecast data (code: %i)", resp.statuscode);
-                } else {
-                    try {
-                        data = http.jsondecode(resp.body);
-
-                        // Add daily API request count to 'data'
-                        count = _getCallCount(resp);
-                        if (count != -1) {
-                            data.callCount <- count;
-                            callCount = count;
-                        }
-                    } catch(exp) {
-                        err = "Unable to decode data received from Dark Sky: " + exp;
-                        data = null;
-                    }
-                }
-
-                cb(err, data);
+                local returnTable = _processResponse(resp);
+                cb(returnTable.err, returnTable.data);
             }.bindenv(this));
             return null;
         } else {
             local resp = req.sendsync();
-            local returnTable;
-            if (resp.statuscode != 200) {
-                err = format("Unable to retrieve forecast data (code: %i)", response.statuscode);
-            } else {
-                try {
-                    data = http.jsondecode(response.body);
-                } catch(exp) {
-                    err = "Unable to decode data received from Dark Sky: " + exp;
-                }
-            }
-
-            // Add daily API request count to 'data'
-            count = _getCallCount(resp);
-            if (count != -1) {
-                data.callCount <- count;
-                callCount = count;
-            }
-
-            // Create table of returned data
-            returnTable.error <- err;
-            returnTable.data <- data;
-            return returnTable;
+            return _processResponse(resp);
         }
+    }
+
+    /**
+     * @typedef {table} decoded
+     *
+     * @property {string|null} err  - An error message, if an error occurred.
+     * @property {table|null}  data - The response data.
+     */
+
+    /**
+     * Process a response received from Dark Sky
+     *
+     * @private
+     *
+     * @param {imp::httpresponse} resp - The HTTPS response.
+     *
+     * @returns {decoded} The latest request count, or -1 on error.
+     *                              
+    */
+    function _processResponse(resp) {
+        local err, data;
+        if (resp.statuscode != 200) {
+            err = format("Unable to retrieve forecast data (code: %i)", resp.statuscode);
+        } else {
+            try {
+                // Have we valid JSON?
+                data = http.jsondecode(resp.body);
+
+                // Add daily API request count to 'data'
+                count = _getCallCount(resp);
+                if (count != -1) {
+                    data.callCount <- count;
+                    callCount = count;
+                }
+            } catch(exp) {
+                err = "Unable to decode data received from Dark Sky: " + exp;
+                data = null;
+            }
+        }
+
+        return {"err" : err, "data" : data};
     }
 
     /**
@@ -281,7 +284,6 @@ class DarkSky {
      *                              
     */
     function _getCallCount(resp) {
-        // 
         if ("headers" in resp) {
             if ("x-forecast-api-calls" in resp.headers) {
                 local a = resp.headers["x-forecast-api-calls"];
