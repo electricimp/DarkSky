@@ -219,7 +219,6 @@ class DarkSky {
      *                              
     */
     function _sendRequest(req, cb = null) {
-        local err, data, count;
         if (cb != null) {
             req.sendasync(function(resp) {
                 local returnTable = _processResponse(resp);
@@ -250,7 +249,7 @@ class DarkSky {
      *                              
     */
     function _processResponse(resp) {
-        local err, data;
+        local err, data, count;
         if (resp.statuscode != 200) {
             err = format("Unable to retrieve forecast data (code: %i)", resp.statuscode);
         } else {
