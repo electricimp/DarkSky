@@ -3,13 +3,13 @@
  * Dark Sky API, ie. forecast requests and time-machine requests. For
  * more information, see https://darksky.net/dev/docs
  * Access to the API is controlled by key. Register for developer access
- * here: https://darksky.net/dev/register
+ * here: https://darksky.net/dev/register.
  *
  * NOTE this class does not parse the incoming data, which is highly complex.
- *      It is up to your application to extract the data you require
+ *      It is up to your application to extract the data you require.
  *
  * @author    Tony Smith (@smittytone)
- * @copyright Electric Imp, Inc. 2016-18
+ * @copyright Electric Imp, Inc. 2016-19
  * @license   MIT
  *
  * @class
@@ -38,12 +38,14 @@ class DarkSky {
     _debug = false;
 
     /**
-     * The Dark Sky construtor
+     * The Dark Sky construtor.
      *
      * @constructor
      *
      * @param {string} apiKey  - Your Dark Sky service API key.
      * @param {bool}   [debug] - Whether to log extra debugging info (true) or not (false). Default: false.
+     *
+     * returns {instance} this
      *
     */
     constructor (key = null, debug = false) {
@@ -60,7 +62,7 @@ class DarkSky {
     }
 
     /**
-     * Make a request for future weather data
+     * Make a request for future weather data.
      *
      * @param {float}    longitude  - Longitude of location for which a forecast is required.
      * @param {float}    latitude   - Latitude of location for which a forecast is required. 
@@ -89,7 +91,7 @@ class DarkSky {
     }
 
     /**
-     * Make a request for historical weather data
+     * Make a request for historical weather data.
      *
      * @param {float}    longitude  - Longitude of location for which a forecast is required.
      * @param {float}    latitude   - Latitude of location for which a forecast is required. 
@@ -135,7 +137,7 @@ class DarkSky {
     }
 
     /**
-     * Get the current Dakr Sky API call count
+     * Get the current Dakr Sky API call count.
      *
      * @returns {integer} The most recent call count.
      *                              
@@ -145,7 +147,7 @@ class DarkSky {
     }
 
     /**
-     * Specify the preferred weather report's units
+     * Specify the preferred weather report's units.
      *
      * @param {string} [units] - Country code indicating the type of units. Default: automatic, based on location.
      *
@@ -175,7 +177,7 @@ class DarkSky {
     }
 
     /**
-     * Specify the preferred weather report's language
+     * Specify the preferred weather report's language.
      *
      * @param {string} [language] - Country code indicating the language. Default: English.
      *
@@ -208,7 +210,7 @@ class DarkSky {
     // ********** PRIVATE FUNCTIONS - DO NOT CALL **********
 
     /**
-     * Specify the preferred weather report's language
+     * Send a request to Dark Sky.
      *
      * @private
      *
@@ -239,7 +241,7 @@ class DarkSky {
      */
 
     /**
-     * Process a response received from Dark Sky
+     * Process a response received from Dark Sky.
      *
      * @private
      *
@@ -273,7 +275,7 @@ class DarkSky {
     }
 
     /**
-     * Extract daily API request count from Dark Sky response header
+     * Extract daily API request count from Dark Sky response header.
      *
      * @private
      *
@@ -297,7 +299,7 @@ class DarkSky {
     }
 
     /**
-     * Check that valid co-ords have been supplied
+     * Check that valid co-ords have been supplied.
      *
      * @private
      *
@@ -346,9 +348,7 @@ class DarkSky {
     }
 
     /**
-     * Add URL-encoded options to the request URL
-     *
-     * Used when assembling HTTPS requests
+     * Add URL-encoded options to the request URL. Used when assembling HTTPS requests.
      *
      * @private
      *

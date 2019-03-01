@@ -235,7 +235,9 @@ See [*setUnits()*](#setunitsunits), above, for an example of *setLanguage()*’s
     - Adopt current Electric Imp library naming scheme.
     - Version number now a string.
     - Instantiation parameter errors now throw.
-    - Minor code improvements.
+    - Bug fixes:
+        - Synchronous operation variables now correctly named. 
+        - Prevent null string error.
 - 1.0.1
     - Fix uninitialized member property.
 - 1.0.0
