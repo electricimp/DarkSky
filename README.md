@@ -1,14 +1,10 @@
 # DarkSky 2.0.0 #
 
+**The Dark Sky serive is no longer available, and so this library is no longer supported**
+
 This class provides access to the Dark Sky API provided by [Dark Sky](https://darksky.net/).
 
-Access to the Dark Sky API is controlled by key. To obtain a key, please register for developer access [here](https://darksky.net/dev/register).
-
-The Dark Sky API returns a wealth of data (in JSON format). As such, it is left to your application to decode the returned data as only you know which data your application requires. You can view the many fields the returned data may contain [here](https://darksky.net/dev/docs).
-
 Please note that the Dark Sky API is a commercial service. Though the first 1000 API calls made under your API key are free of charge, subsequent calls are billed at a rate of $0.0001 per call. You and your application will not be notified by the library if this occurs, so you may wish to add suitable call-counting code to your application. The usage terms also require the addition of a “Powered by Dark Sky” badge that links to `https://darksky.net/poweredby/` wherever data from the API is displayed.
-
-**To include this library in your project, add** `#require "DarkSky.agent.lib.nut:2.0.0"` **at the top of your agent code**
 
 ## Class Usage ##
 
