@@ -1,6 +1,6 @@
 # DarkSky 2.0.0 #
 
-**The Dark Sky serive is no longer available, and so this library is no longer supported**
+**The Dark Sky service is no longer available, and so this library is no longer supported**
 
 This class provides access to the Dark Sky API provided by [Dark Sky](https://darksky.net/).
 
